@@ -14,12 +14,16 @@
        <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
     </div>
 
+    <table class="table" id="tableOfPeople">
+      <tr>
+        <th>nome</th>
+        <th>cognome</th>
+        <th>cf</th>
+      </tr>
+    </table>
 
-
-    <!-- add the shim first -->
-    <script type="text/javascript" src="shim.min.js"></script>
-    <!-- after the shim is referenced, add the library -->
-    <script type="text/javascript" src="xlsx.full.min.js"></script>
+    <!-- XLSX -->
+    <script lang="javascript" src="node_modules/xlsx/dist/xlsx.full.min.js"></script>
     <!--jQuery-->
     <script>
       window.$ = window.jQuery = require("jquery")

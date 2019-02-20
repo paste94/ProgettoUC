@@ -18,6 +18,18 @@ $(document).ready(function(){
         var jsonString = XLSX.utils.sheet_to_json(worksheet)
         alert(JSON.stringify(jsonString))
 
+        /* Riempie tabella da json*/
+        $.each(jsonString, function(i, item) {
+            alert(JSON.stringify(item))
+            $('#tableOfPeople').append(
+              $('<tr>').append(
+                $('<td>').text(item.Nome),
+                $('<td>').text(item.Cognome),
+                $('<td>').text(item.cf)
+              )
+            )
+        });
+
         //alert('The file "' + fileName +  '" has been selected.');
     });
 });
