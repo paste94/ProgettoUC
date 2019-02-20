@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <title>Hello World!</title>
+  </head>
+  <body>
+    <h1>Races Manager</h1>
+
+    <!--Scegli file-->
+    <div class="custom-file">
+       <input type="file" class="custom-file-input" id="inputGroupFile01">
+       <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+    </div>
+
+
+
+    <!-- add the shim first -->
+    <script type="text/javascript" src="shim.min.js"></script>
+    <!-- after the shim is referenced, add the library -->
+    <script type="text/javascript" src="xlsx.full.min.js"></script>
+    <!--jQuery-->
+    <script>
+      window.$ = window.jQuery = require("jquery")
+    </script>
+    <!--Elenco di funzioni jquery-->
+    <script type="text/javascript" src="utilities.js"></script>
+
+  </body>
+</html>
