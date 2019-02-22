@@ -18,14 +18,24 @@ $(document).ready(function(){
         var jsonString = XLSX.utils.sheet_to_json(worksheet)
         alert(JSON.stringify(jsonString))
 
+        /* Crea header della tabella*/
+        $('#header').append(
+          $('<th>').text("Seleziona")
+        )
+        for(key in jsonString[0]){
+          $('#header').append(
+            $('<th>').text(key)
+          )
+        }
+
         /* Riempie tabella da json*/
         $.each(jsonString, function(i, item) {
-            alert(JSON.stringify(item))
             $('#tableOfPeople').append(
               $('<tr>').append(
-                $('<td>').text(item.Nome),
-                $('<td>').text(item.Cognome),
-                $('<td>').text(item.cf)
+                $('<td>').append('<input type="checkbox" /> <br>'),
+                $('<td scope="col">').text(item.Nome),
+                $('<td scope="col">').text(item.Cognome),
+                $('<td scope="col">').text(item.cf)
               )
             )
         });
