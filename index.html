@@ -3,28 +3,35 @@
   <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.css">
     <title>Hello World!</title>
   </head>
   <body>
-    <div class="container">
-      <div class="row">
-        <div class="col-4">
-          <h1>Races Manager</h1>
-        </div>
-        <div class="col-3 offset-5">
-          <!--Scegli file-->
-          <div class="custom-file" style="height:0px;">
-            <input type="file" class="custom-file-input" style="height:0px;" id="inputGroupFile01">
-            <label class="btn btn-primary" for="inputGroupFile01">Selezionare un file</label>
-          </div>
-        </div>
-      </div>
+
+    <i class="fas fa-igloo"></i>
+    <div class="container-fluid">
 
 
 
+      <!-- Scegli file -->
+      <input type="file" class="custom-file-input" style="height:0px;" id="inputGroupFile01">
 
       <!-- Tabella -->
-      <div class="card" style="width: 98%; margin-left: auto; margin-right: auto; margin-top: 8px;">
+      <div class="card" style="width: 98%; ">
+        <div class="row text-left">
+          <div class="col-6">
+            <h1 style="padding-left: 0.5em;">Races Manager</h1>
+          </div>
+          <div class="col-6">
+            <div class="row text-right">
+              <!--Scegli file-->
+              <div class="custom-file" style="padding-right:2em; padding-top: 0.5em;">
+                <label class="btn btn-success" for="inputGroupFile01">
+                  <i class="fa fa-file-excel-o"></i> Carica file Excel</label>
+              </div>
+            </div>
+          </div>
+        </div>
         <table class="table table-hover" id="tableOfPeople" style="margin-bottom:0px;">
           <tr id="header" class="thead-light">
           </tr>
