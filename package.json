@@ -16,6 +16,8 @@
   "dependencies": {
     "@icon/font-awesome": "^4.7.0-2",
     "bootstrap": "^4.3.1",
+    "datatables.net": "^1.10.19",
+    "datatables.net-bs4": "^1.10.19",
     "font-awesome-icons": "^1.5.0",
     "jquery": "^3.3.1",
     "jsdom": "^13.2.0",

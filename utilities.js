@@ -1,4 +1,7 @@
 const faIcons = require('font-awesome-icons');
+window.$ = window.jQuery = require("jquery")
+var dt = require( 'datatables.net' )();
+var bs4 = require( 'datatables.net-bs4' )( );
 
 faIcons.getList().then(icons => console.log(icons.length));
 //=> 675
@@ -18,9 +21,44 @@ $( document ).ready(function() {
 
 });
 
+$(document).ready(function(){
+  $('#download-file').click(function(){
+    if(typeof require !== 'undefined') XLSX = require('xlsx');
+    //TODO: Genera il file json dalla tabella
+
+    /*
+    var data = [
+      {"name":"John", "city": "Seattle"},
+      {"name":"Mike", "city": "Los Angeles"},
+      {"name":"Zach", "city": "New York"}
+    ];
+    */
+    /* make the worksheet */
+    var ws = XLSX.utils.json_to_sheet(data);
+
+    /* add to workbook */
+    var wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "People");
+    //TODO: Scegli il path in cui salvare il file
+    XLSX.writeFile(wb, "sheetjs.xlsx");
+    //alert(data);
+
+    //saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), "sheetjs.xlsx");
+
+  });
+});
+
+// Order table
+$(document).ready(function () {
+  //TODO: Cambia l'ordine dei record della tabella
+  //  $('#tableOfPeople').DataTable();
+  //  $('.dataTables_length').addClass('bs-select');
+});
+
 // Gestione del file una volta selezionato
 $(document).ready(function(){
     $('input[type="file"]').change(function(e){
+        $('#hint').remove();
         var fileName = e.target.files[0].path;
         if(typeof require !== 'undefined') XLSX = require('xlsx');
         var workbook = XLSX.readFile(fileName, {cellDates:true, cellNF:false, cellText:false});
@@ -33,31 +71,31 @@ $(document).ready(function(){
         /* Convert all sheet to json object */
         var jsonString = XLSX.utils.sheet_to_json(worksheet, {dateNF:'YYYY-MM-DD'})
 
-        alert(JSON.stringify(jsonString[0]))
+        /* Riempi tabella */
+        var table = $('#tableOfPeople').DataTable();
+        var counter = 1;
+        $.each(jsonString, function(i, item){
+          if(item.DataNascita != null){
+            table.row.add([
+              'ciao',
+              item.Cognome,
+              item.Nome,
+              item.DataNascita.getDate() + '/' + (item.DataNascita.getMonth() + 1) + '/' + item.DataNascita.getUTCFullYear(),
+              item.CodFis
 
-        /* Crea header della tabella*/
-        $('#header').append(
-          $('<th>').text("Seleziona"),
-          $('<th>').text("Cognome"),
-          $('<th>').text("Nome"),
-          $('<th>').text("Data di nascita"),
-          $('<th>').text("Codice Fiscale")
-        )
-        /*
-        for(key in jsonString[0]){
-          if(key!='ID' && key != 'Codice' && key != 'IDSodalizio'){
-            $('#header').append(
-              $('<th>').text(key)
-            )
+            ]).draw( false );
           }
-        }
-        */
+          else{
+            alert('Attenzione: Ad una o più righe manca la data di nascita!')
+          }
+        });
 
 
         /* Riempie tabella da json*/
+        /*
         $.each(jsonString, function(i, item) {
             $('#tableOfPeople').append(
-              $('<tr>').append(
+              $('<tbody>').append(
                 $('<td>').append('<input type="checkbox" /> <br>'),
                 //$('<td scope="col">').text(item.Numero),
                 $('<td scope="col">').text(item.Cognome),
@@ -66,7 +104,7 @@ $(document).ready(function(){
                 //$('<td scope="col">').text(item.CAP),
                 //$('<td scope="col">').text(item.Data),
                 //$('<td scope="col">').text(item.LuogoNascita),
-                $('<td scope="col">').text(item.DataNascita.getUTCDate() + '/' + item.DataNascita.getUTCMonth() + '/' + item.DataNascita.getUTCFullYear()),
+                $('<td scope="col">').text(item.DataNascita.getDate() + '/' + (item.DataNascita.getMonth() + 1) + '/' + item.DataNascita.getUTCFullYear()),
                 $('<td scope="col">').text(item.CodFis),
                 //$('<td scope="col">').text(item.Comune),
                 //$('<td scope="col">').text(item.Sesso),
@@ -90,7 +128,6 @@ $(document).ready(function(){
               )
             )
         });
-
-        //alert('The file "' + fileName +  '" has been selected.');
+        */
     });
 });
