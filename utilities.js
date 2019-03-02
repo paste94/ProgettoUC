@@ -1,26 +1,34 @@
 const faIcons = require('font-awesome-icons');
 window.$ = window.jQuery = require("jquery")
 var dt = require( 'datatables.net' )();
+var sel = require( 'datatables.net-select' )( );
 var bs4 = require( 'datatables.net-bs4' )( );
-
+var select = require( 'datatables.net-select-bs4' )( );
+var table; // Utilizzata per datatables
 faIcons.getList().then(icons => console.log(icons.length));
-//=> 675
-
 faIcons.getList().then(icons => console.log(icons[0]));
-/*=>
-{ name: 'Glass',
-  id: 'glass',
-  unicode: 'f000',
-  created: 1,
-  filter: [ 'martini', 'drink', 'bar', 'alcohol', 'liquor' ],
-  categories: [ 'Web Application Icons' ]
-}
-*/
 
+/* Assegna alla tabella la proprietà di datatables */
+$(document).ready(function(){
+  table = $('#tableOfPeople').DataTable({
+     columns: [
+             { data: "Cognome" },
+             { data: "Nome" },
+             { data: "Data di Nascita" },
+             { data: "Codice Fiscale" }
+
+         ]
+   }) // Fine DataTable
+}) // Fine function
+
+/*  */
 $( document ).ready(function() {
-
+  $('#button').click( function () {
+      alert( table.rows('.selected').data().length +' row(s) selected' );
+  } );
 });
 
+/* Salva il file con i corridori selezionati */
 $(document).ready(function(){
   $('#download-file').click(function(){
     if(typeof require !== 'undefined') XLSX = require('xlsx');
@@ -48,14 +56,17 @@ $(document).ready(function(){
   });
 });
 
-// Order table
+
+
+/* Definisce la selezione di un corridore sulla tabella */
+/* Imposta 'selected' alla riga */
 $(document).ready(function () {
-  //TODO: Cambia l'ordine dei record della tabella
-  //  $('#tableOfPeople').DataTable();
-  //  $('.dataTables_length').addClass('bs-select');
+  $('#tableOfPeople tbody').on( 'click', 'tr', function () {
+        $(this).toggleClass('selected');
+    } );
 });
 
-// Gestione del file una volta selezionato
+/* Gestione del file una volta selezionato */
 $(document).ready(function(){
     $('input[type="file"]').change(function(e){
         $('#hint').remove();
@@ -72,62 +83,18 @@ $(document).ready(function(){
         var jsonString = XLSX.utils.sheet_to_json(worksheet, {dateNF:'YYYY-MM-DD'})
 
         /* Riempi tabella */
-        var table = $('#tableOfPeople').DataTable();
-        var counter = 1;
         $.each(jsonString, function(i, item){
-          if(item.DataNascita != null){
-            table.row.add([
-              'ciao',
-              item.Cognome,
-              item.Nome,
-              item.DataNascita.getDate() + '/' + (item.DataNascita.getMonth() + 1) + '/' + item.DataNascita.getUTCFullYear(),
-              item.CodFis
-
-            ]).draw( false );
+          if(item.DataNascita != null){ // Necessario per via di un errore che blocca tutta la funzione
+            table.row.add({
+              'Cognome':          item.Cognome,
+              'Nome':             item.Nome,
+              'Data di Nascita':  item.DataNascita.getDate() + '/' + (item.DataNascita.getMonth() + 1) + '/' + item.DataNascita.getUTCFullYear(),
+              'Codice Fiscale':   item.CodFis
+            }).draw( false );
           }
           else{
             alert('Attenzione: Ad una o più righe manca la data di nascita!')
           }
         });
-
-
-        /* Riempie tabella da json*/
-        /*
-        $.each(jsonString, function(i, item) {
-            $('#tableOfPeople').append(
-              $('<tbody>').append(
-                $('<td>').append('<input type="checkbox" /> <br>'),
-                //$('<td scope="col">').text(item.Numero),
-                $('<td scope="col">').text(item.Cognome),
-                $('<td scope="col">').text(item.Nome),
-                //$('<td scope="col">').text(item.Indirizzo),
-                //$('<td scope="col">').text(item.CAP),
-                //$('<td scope="col">').text(item.Data),
-                //$('<td scope="col">').text(item.LuogoNascita),
-                $('<td scope="col">').text(item.DataNascita.getDate() + '/' + (item.DataNascita.getMonth() + 1) + '/' + item.DataNascita.getUTCFullYear()),
-                $('<td scope="col">').text(item.CodFis),
-                //$('<td scope="col">').text(item.Comune),
-                //$('<td scope="col">').text(item.Sesso),
-                //$('<td scope="col">').text(item.IDTipoTessera),
-                //$('<td scope="col">').text(item.Telefono),
-                //$('<td scope="col">').text(item.Cellulare),
-                //$('<td scope="col">').text(item.email),
-                //$('<td scope="col">').text(item.SiglaProvincia),
-                //$('<td scope="col">').text(item.SettoreSportivo),
-                //$('<td scope="col">').text(item.Qualifica),
-                //$('<td scope="col">').text(item.Photo),
-                //$('<td scope="col">').text(item.IDSport),
-                //$('<td scope="col">').text(item.SottoQualifica),
-                //$('<td scope="col">').text(item.LettereProtocollo),
-                //$('<td scope="col">').text(item.NumeroProtocollo),
-                //$('<td scope="col">').text(item.DataProtocollo),
-                //$('<td scope="col">').text(item.DataRilascio),
-                //$('<td scope="col">').text(item.CoperturaSanitaria),
-                //$('<td scope="col">').text(item.Datascadenza)
-
-              )
-            )
-        });
-        */
     });
 });
