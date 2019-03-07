@@ -57,9 +57,7 @@ $(document).ready(function(){
       ]
     })
     
-    alert(filename)
-    if(filename === null){
-      alert("Nome del persorso non valido");
+    if(filename == null){
       return;
     }
 
@@ -83,6 +81,7 @@ $(document).ready(function () {
     } );
 });
 
+/* Caricare file */
 $(document).ready(function(){
   $('#load-file').click(function(){
     /* Dialog per selezionare il file da caricare  */
@@ -94,6 +93,10 @@ $(document).ready(function(){
         }
       ]
     })
+    
+    if(fileName == null){
+      return
+    }
 
     popupS.prompt({
       //TODO: Con l'invio non funziona, controllare perchè!
@@ -127,6 +130,7 @@ $(document).ready(function(){
         }); // End foreach
         
         $('#download-file').prop('disabled', false);
+        $('#hint').prop('hidden', true)
       }
   });
 
