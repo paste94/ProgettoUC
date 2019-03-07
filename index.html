@@ -5,6 +5,7 @@
     <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.css">
     <link rel="stylesheet" href="util.css">
+    <link rel="stylesheet" href="node_modules/popups/css/popupS.min.css">
     <title>Hello World!</title>
   </head>
   <body>
@@ -17,8 +18,9 @@
       <!-- Scegli file -->
       <input type="file" class="custom-file-input" style="height:0px;" id="inputGroupFile01">
 
-      <!-- Tabella -->
+      <!-- CARD -->
       <div class="card">
+        <!-- CARD HEADER -->
         <div class="card-header">
           <div class="row text-left">
             <div class="col-6">
@@ -26,7 +28,7 @@
             </div>
             <div class="col-6">
               <div class="row text-right">
-                <!--Scegli file-->
+                <!-- SCEGLI FILE -->
                 <div class="custom-file" style="padding-right:2em; padding-top: 0.5em;">
                   <label class="btn btn-success" for="inputGroupFile01">
                     <i class="fa fa-file-excel-o"></i> Carica file Excel</label>
@@ -34,8 +36,8 @@
               </div>
             </div>
           </div>
-        </div>
-        <div class="card-body">
+        </div> <!-- /CARD HEADER -->
+        <div class="card-body"> <!-- CARD BODY -->
           <h3 id="hint">Fare click su "Carica file excel" per generare la tabella</h3>
           <div class="scrollable">
             <table class="table table-striped table-bordered" id="tableOfPeople">
@@ -45,28 +47,33 @@
                   <th>Nome</th>
                   <th>Data di nascita</th>
                   <th>Codice Fiscale</th>
+                  <th>Codice Fiscale Società</th>
                 </tr>
               </thead>
             </table>
           </div>
-        </div>
-        <div class="card-footer">
-          <button id="button">prova</button>
-          <button id="download-file" class="btn btn-primary">
+        </div> <!-- /CARD BODY -->
+        <div class="card-footer"> <!-- CARD FOOTER -->
+          <!--button id="button">prova</button-->
+          <button id="download-file" class="btn btn-primary" disabled='true'>
             <i class="fa fa-download"></i>
               Scarica file Presenze
           </button>
-        </div>
+        </div> <!-- /CARD FOOTER -->
       </div>
     </div>
+    <p id="debug"></p>
     <!-- XLSX -->
     <script lang="javascript" src="node_modules/xlsx/dist/xlsx.full.min.js"></script>
+
+
     <!--jQuery-->
     <script>
 
     </script>
     <!--Elenco di funzioni jquery-->
     <script type="text/javascript" src="utilities.js"></script>
+    <!--script lang="javascript" src="node_modules/datatables.net-buttons/js/buttons.html5.js"></script-->
 
   </body>
 </html>
