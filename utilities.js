@@ -1,7 +1,4 @@
-//import 'node_modules/datatables.net-buttons/js/buttons.html5.js';
-const faIcons = require('font-awesome-icons');
 window.$ = window.jQuery = require("jquery")
-//var dt = require( 'datatables.net' )();
 // https://datatables.net/download/
 var dt = require( 'datatables.net' )( window, $ );
 require( 'jszip' );
@@ -9,16 +6,10 @@ require( 'datatables.net-bs4' )();
 require( 'datatables.net-buttons-bs4' )();
 require( 'datatables.net-buttons/js/buttons.html5.js' )();
 require( 'datatables.net-select-bs4' )();
-
-
-//var sel = require( 'datatables.net-select' )( );
-//var bs4 = require( 'datatables.net-bs4' )( );
-//var select = require( 'datatables.net-select-bs4' )( );
+const fs = require("fs");
+const {dialog} = require("electron").remote;
 var popupS = require('popups');
-//require( 'datatables.net-buttons-bs4' )( window, $ );
 var table; // Utilizzata per datatables
-faIcons.getList().then(icons => console.log(icons.length));
-faIcons.getList().then(icons => console.log(icons[0]));
 
 /* Assegna alla tabella la proprietà di datatables */
 $(document).ready(function(){
@@ -33,7 +24,7 @@ $(document).ready(function(){
    }) // Fine DataTable
 }) // Fine function
 
-/*  */
+/* Prova */
 $( document ).ready(function() {
   $('#button').click( function () {
       alert( table.rows('.selected').data().length +' row(s) selected' );
@@ -43,28 +34,42 @@ $( document ).ready(function() {
 /* Salva il file con i corridori selezionati */
 $(document).ready(function(){
   $('#download-file').click(function(){
+
+    /* Crea un file json con i dati selezionati in tabella */
     var jsonObj = [];
     table.rows('.selected').every(function(rowIdx, tableLoop, rowLoop){
       jsonObj.push(this.data()); // Stringa json che rappresenta la riga
     })
-    if(jsonObj.length > 0){
-      if(typeof require !== 'undefined') XLSX = require('xlsx');
 
-      var ws = XLSX.utils.json_to_sheet(jsonObj);
-
-      /* add to workbook */
-      var wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "People");
-      //TODO: Scegli il path in cui salvare il file
-      XLSX.writeFile(wb, "Partecipanti.xlsx");
-      //alert(data);
-
-      //saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), "sheetjs.xlsx");
-
-    }else {
-      alert('Attenzione, selezionare almeno una riga prima di proseguire!')
+    /* Controlla che il file contenga qualcosa */
+    if(jsonObj.length <= 0){
+      alert('Attenzione, selezionare almeno una riga prima di proseguire!');
+      return;
     }
 
+    /* Mostra il dialog per selezionare dove salvare il file */
+    var filename = dialog.showSaveDialog({
+      filters: [
+        {
+          name: 'Excel (.xlsx)',
+          extensions: ['xlsx']
+        }
+      ]
+    })
+    
+    alert(filename)
+    if(filename === null){
+      alert("Nome del persorso non valido");
+      return;
+    }
+
+    /* Salva il file */
+    if(typeof require !== 'undefined') XLSX = require('xlsx'); // Richiede dipendenze se non ci sono
+    var ws = XLSX.utils.json_to_sheet(jsonObj);
+    var wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "People");
+    XLSX.writeFile(wb, filename);
+    
   });
 });
 
@@ -78,12 +83,26 @@ $(document).ready(function () {
     } );
 });
 
+
+
+
+
+
+
+
+
+
+
+
 /* Gestione del file una volta selezionato */
+//TODO: Fai selezionare solo file excel
+//TODO: Avvisa se non trova dei campi (es. se ha caricato un file errato)
 $(document).ready(function(){
     $('input[type="file"]').change(function(e){
         $('#hint').remove();
         var societyCF;
         popupS.prompt({
+            //TODO: Con l'invio non funziona, controllare perchè!
             content:     'Inserire il codice fiscale della società',
             onSubmit: function(val) {
                 if(val) {
@@ -115,11 +134,6 @@ $(document).ready(function(){
                           'Codice Fiscale Società': societyCF
                         }).draw( false );
                       }
-                      /*
-                      else{
-                        alert('Attenzione: Ad una o più righe manca la data di nascita!')
-                      }
-                      */
                     });
                 } else {
                     popupS.alert({
