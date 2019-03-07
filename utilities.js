@@ -83,65 +83,52 @@ $(document).ready(function () {
     } );
 });
 
-
-
-
-
-
-
-
-
-
-
-
-/* Gestione del file una volta selezionato */
-//TODO: Fai selezionare solo file excel
-//TODO: Avvisa se non trova dei campi (es. se ha caricato un file errato)
 $(document).ready(function(){
-    $('input[type="file"]').change(function(e){
-        $('#hint').remove();
-        var societyCF;
-        popupS.prompt({
-            //TODO: Con l'invio non funziona, controllare perchè!
-            content:     'Inserire il codice fiscale della società',
-            onSubmit: function(val) {
-                if(val) {
-                    societyCF = val;
-                    //alert(societyCF)
-                    var fileName = e.target.files[0].path;
-                    if(typeof require !== 'undefined') XLSX = require('xlsx');
-                    var workbook = XLSX.readFile(fileName, {cellDates:true, cellNF:false, cellText:false});
-                    var first_sheet_name = workbook.SheetNames[0];
-                    var address_of_cell = 'A1';
+  $('#load-file').click(function(){
+    /* Dialog per selezionare il file da caricare  */
+    var fileName = dialog.showOpenDialog({
+      filters: [
+        {
+          name: 'Excel (.xlsx; .xls)',
+          extensions: ['xlsx', 'xls']
+        }
+      ]
+    })
 
-                    /* Get worksheet */
-                    var worksheet = workbook.Sheets[first_sheet_name];
+    popupS.prompt({
+      //TODO: Con l'invio non funziona, controllare perchè!
+      content: 'Inserire il codice fiscale della società',
+      onSubmit: function(societyCF) {
+        if(societyCF === null) {
+          alert('Inserire qualcosa!')
+          return
+        }
+        //var fileName = e.target.files[0].path;
+        if(typeof require !== 'undefined') XLSX = require('xlsx');
+        var workbook = XLSX.readFile(fileName[0], {cellDates:true, cellNF:false, cellText:false});
+        var first_sheet_name = workbook.SheetNames[0];
+        /* Ottieni worksheet */
+        var worksheet = workbook.Sheets[first_sheet_name];
 
-                    /* Convert all sheet to json object */
-                    var jsonString = XLSX.utils.sheet_to_json(worksheet, {dateNF:'YYYY-MM-DD'})
+        /* Convert all sheet to json object */
+        var jsonString = XLSX.utils.sheet_to_json(worksheet, {dateNF:'YYYY-MM-DD'})
 
-                    /* Riempi tabella */
-                    $.each(jsonString, function(i, item){
-                      if(item.DataNascita != null
-                         && item.Cognome != null
-                         && item.Nome != null
-                         && item.DataNascita != null){ // Necessario per via di un errore che blocca tutta la funzione
-                        table.row.add({
-                          'Cognome':          item.Cognome,
-                          'Nome':             item.Nome,
-                          'Data di Nascita':  item.DataNascita.getDate() + '/' + (item.DataNascita.getMonth() + 1) + '/' + item.DataNascita.getUTCFullYear(),
-                          'Codice Fiscale':   item.CodFis,
-                          'Codice Fiscale Società': societyCF
-                        }).draw( false );
-                      }
-                    });
-                } else {
-                    popupS.alert({
-                        content: 'Inserire qualcosa! :('
-                    });
-                }
-                $('#download-file').prop('disabled', false);
-            }
-        });
-    });
+        /* Riempi tabella */
+        $.each(jsonString, function(i, item){
+          if(item.DataNascita != null && item.Cognome != null && item.Nome != null && item.DataNascita != null){ // Necessario per via di un errore che blocca tutta la funzione
+            table.row.add({
+              'Cognome':          item.Cognome,
+              'Nome':             item.Nome,
+              'Data di Nascita':  item.DataNascita.getDate() + '/' + (item.DataNascita.getMonth() + 1) + '/' + item.DataNascita.getUTCFullYear(),
+              'Codice Fiscale':   item.CodFis,
+              'Codice Fiscale Società': societyCF
+            }).draw( false );
+          }
+        }); // End foreach
+        
+        $('#download-file').prop('disabled', false);
+      }
+  });
+
+  })
 });
