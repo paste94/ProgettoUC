@@ -20,11 +20,11 @@ $(document).ready(function(){
              { data: "Cognome", title: "Cognome" },
              { data: "Nome", title: "Nome" },
              { data: "Sesso", title: "Sesso" },
-             { data: "DataNascita", title: "Data di Nascita" },
+             { data: "Data di Nascita", title: "Data di Nascita" },
              { data: "Cat", title: "Cat" },
-             { data: "CodFis", title: "Codice Fiscale" },
-             { data: "CodFisSoc", title: "Codice Fiscale Società"},
-             { data: "Soc", title: "Nome Società"},
+             { data: "Codice Fiscale", title: "Codice Fiscale" },
+             { data: "CodSoc", title: "Cod.Soc."},
+             { data: "Team", title: "Nome Società"},
              { data: "Tessera", title: "Tessera"}
          ]
    }) // Fine DataTable
@@ -146,7 +146,7 @@ $(document).ready(function(){
   })
 });
 */
-/* Caricare file */
+/* Caricare file XLS*/
 $(document).ready(function(){
   $('#load-file').click(function(){
     /* Dialog per selezionare il file da caricare  */
@@ -183,11 +183,11 @@ $(document).ready(function(){
           'Nome':             item.Nome,
           'Sesso':            item.Sesso,
           //'DataNascita':      item['Data di Nascita'],
-          'DataNascita':      item['Data di Nascita'].getDate() + '/' + (item['Data di Nascita'].getMonth() + 1) + '/' + item['Data di Nascita'].getUTCFullYear(),
+          'Data di Nascita':  item['Data di Nascita'].getDate() + '/' + (item['Data di Nascita'].getMonth() + 1) + '/' + item['Data di Nascita'].getUTCFullYear(),
           'Cat':              item.Cat,
-          'CodFis':           item.CodFis,
-          'CodFisSoc':        item['Cod.Soc.'],
-          'Soc':              item.Team,
+          'Codice Fiscale':   item['Codice Fiscale'],
+          'CodSoc':           item['Cod.Soc.'],
+          'Team':             item.Team,
           'Tessera':          item.Tessera
         }).draw( false );
       //}
@@ -212,7 +212,7 @@ $(document).ready(function(){
     //alert(JSON.stringify(jsonObj))
 
     /* Mostra il dialog per selezionare dove salvare il file */
-    var filename = dialog.showSaveDialog({
+    var fileName = dialog.showSaveDialog({
       filters: [
         {
           name: 'Bici (.bici)',
@@ -222,7 +222,57 @@ $(document).ready(function(){
     })
 
     var jsonString = JSON.stringify(jsonObj);
-    fs.writeFile(filename, jsonString, 'utf8', function(){});
+    fs.writeFile(fileName, jsonString, 'utf8', function(){});
 
+  })
+})
+
+$(document).ready(function(){
+  $('#load-file-bici').click(function(){
+    /* Dialog per selezionare il file da caricare  */
+    var fileName = dialog.showOpenDialog({
+      filters: [
+        {
+          name: 'Bici (.bici)',
+          extensions: ['bici']
+        }
+      ]
+    })
+    
+    if(fileName == null){
+      return
+    }
+
+    var jsonObj;
+    fs.readFile(fileName[0], 'utf8', function(err, data){
+      if(err){
+        alert('Qualcosa è andato storto :/');
+        return;
+      }
+      jsonObj = JSON.parse(data);
+      alert(data)
+      /* Riempi tabella */
+      $.each(jsonObj, function(i, item){
+      alert(item['Cod.Soc.'])
+      //alert(JSON.stringify(jsonString))
+      //if(item.DataNascita != null && item.Cognome != null && item.Nome != null && item.DataNascita != null){ // Necessario per via di un errore che blocca tutta la funzione
+        table.row.add({
+          'Pettorale':        item.Pettorale,
+          'Cognome':          item.Cognome,
+          'Nome':             item.Nome,
+          'Sesso':            item.Sesso,
+          'Data di Nascita':  item['Data di Nascita'],
+          //'Data di Nascita':  item['Data di Nascita'].getDate() + '/' + (item['Data di Nascita'].getMonth() + 1) + '/' + item['Data di Nascita'].getUTCFullYear(),
+          'Cat':              item.Cat,
+          'Codice Fiscale':   item['Codice Fiscale'],
+          'CodSoc':           item.CodSoc,
+          'Team':             item.Team,
+          'Tessera':          item.Tessera
+        }).draw( false );
+      //}
+      }); // End foreach
+      
+    });
+    //alert(JSON.stringify(jsonObj))
   })
 })
