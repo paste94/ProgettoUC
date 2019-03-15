@@ -23,7 +23,9 @@ $(document).ready(function(){
              { data: "DataNascita", title: "Data di Nascita" },
              { data: "Cat", title: "Cat" },
              { data: "CodFis", title: "Codice Fiscale" },
-             { data: "CodFisSoc", title: "Codice Fiscale Società"}
+             { data: "CodFisSoc", title: "Codice Fiscale Società"},
+             { data: "Soc", title: "Nome Società"},
+             { data: "Tessera", title: "Tessera"}
          ]
    }) // Fine DataTable
 }) // Fine function
@@ -173,24 +175,54 @@ $(document).ready(function(){
 
     /* Riempi tabella */
     $.each(jsonString, function(i, item){
-      alert(JSON.stringify(jsonString))
+      //alert(JSON.stringify(jsonString))
       //if(item.DataNascita != null && item.Cognome != null && item.Nome != null && item.DataNascita != null){ // Necessario per via di un errore che blocca tutta la funzione
         table.row.add({
           'Pettorale':        item.Pettorale,
           'Cognome':          item.Cognome,
           'Nome':             item.Nome,
           'Sesso':            item.Sesso,
-          'DataNascita':      item['Data di Nascita'],
-          //'DataNascita':      item['Data di Nascita'].getDate() + '/' + (itemitem['Data di Nascita'].getMonth() + 1) + '/' + itemitem['Data di Nascita'].getUTCFullYear(),
+          //'DataNascita':      item['Data di Nascita'],
+          'DataNascita':      item['Data di Nascita'].getDate() + '/' + (item['Data di Nascita'].getMonth() + 1) + '/' + item['Data di Nascita'].getUTCFullYear(),
           'Cat':              item.Cat,
           'CodFis':           item.CodFis,
-          'CodFisSoc':        'ciao'
+          'CodFisSoc':        item['Cod.Soc.'],
+          'Soc':              item.Team,
+          'Tessera':          item.Tessera
         }).draw( false );
       //}
     }); // End foreach
     
     $('#download-file').prop('disabled', false);
     $('#hint').prop('hidden', true)
+    $('#save-table').prop('disabled', false);
+    $('#download-classifica').prop('disabled', false);
 
   })
 });
+
+$(document).ready(function(){
+  $('#save-table').click(function(){
+    /* Crea un file json con i dati selezionati in tabella */
+    var jsonObj = [];
+    table.rows().every(function(rowIdx, tableLoop, rowLoop){
+      jsonObj.push(this.data()); // Stringa json che rappresenta la riga
+    })
+
+    //alert(JSON.stringify(jsonObj))
+
+    /* Mostra il dialog per selezionare dove salvare il file */
+    var filename = dialog.showSaveDialog({
+      filters: [
+        {
+          name: 'Bici (.bici)',
+          extensions: ['bici']
+        }
+      ]
+    })
+
+    var jsonString = JSON.stringify(jsonObj);
+    fs.writeFile(filename, jsonString, 'utf8', function(){});
+
+  })
+})
