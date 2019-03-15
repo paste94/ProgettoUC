@@ -14,12 +14,16 @@ var table; // Utilizzata per datatables
 /* Assegna alla tabella la proprietà di datatables */
 $(document).ready(function(){
   table = $('#tableOfPeople').DataTable({
+     lengthMenu: [[10,50,100,500,-1], [10,50,100,500,'All']],
      columns: [
-             { data: "Cognome" },
-             { data: "Nome" },
-             { data: "Data di Nascita" },
-             { data: "Codice Fiscale" },
-             { data: "Codice Fiscale Società"}
+             { data: "Pettorale", title: "Pettorale"},
+             { data: "Cognome", title: "Cognome" },
+             { data: "Nome", title: "Nome" },
+             { data: "Sesso", title: "Sesso" },
+             { data: "DataNascita", title: "Data di Nascita" },
+             { data: "Cat", title: "Cat" },
+             { data: "CodFis", title: "Codice Fiscale" },
+             { data: "CodFisSoc", title: "Codice Fiscale Società"}
          ]
    }) // Fine DataTable
 }) // Fine function
@@ -82,6 +86,65 @@ $(document).ready(function () {
 });
 
 /* Caricare file */
+/*
+$(document).ready(function(){
+  $('#load-file').click(function(){
+    // Dialog per selezionare il file da caricare 
+    var fileName = dialog.showOpenDialog({
+      filters: [
+        {
+          name: 'Excel (.xlsx; .xls)',
+          extensions: ['xlsx', 'xls']
+        }
+      ]
+    })
+    
+    if(fileName == null){
+      return
+    }
+
+    popupS.prompt({
+      content: 'Inserire il codice fiscale della società',
+      onSubmit: function(societyCF) {
+        if(societyCF === null) {
+          alert('Inserire qualcosa!')
+          return
+        }
+        //var fileName = e.target.files[0].path;
+        if(typeof require !== 'undefined') XLSX = require('xlsx');
+        var workbook = XLSX.readFile(fileName[0], {cellDates:true, cellNF:false, cellText:false});
+        var first_sheet_name = workbook.SheetNames[0];
+        //Ottieni worksheet 
+        var worksheet = workbook.Sheets[first_sheet_name];
+
+        // Convert all sheet to json object 
+        var jsonString = XLSX.utils.sheet_to_json(worksheet, {dateNF:'YYYY-MM-DD'})
+
+        // Riempi tabella 
+        $.each(jsonString, function(i, item){
+          if(item.DataNascita != null && item.Cognome != null && item.Nome != null && item.DataNascita != null){ // Necessario per via di un errore che blocca tutta la funzione
+            table.row.add({
+              'Pettorale':        item.Pettorale,
+              'Cognome':          item.Cognome,
+              'Nome':             item.Nome,
+              'Sesso':            item.Sesso,
+              'Data di Nascita':  item.DataNascita.getDate() + '/' + (item.DataNascita.getMonth() + 1) + '/' + item.DataNascita.getUTCFullYear(),
+              'Cat':              item.Cat,
+              'Codice Fiscale':   item.CodFis,
+              'Codice Fiscale Società': societyCF
+            }).draw( false );
+          }
+        }); // End foreach
+        
+        $('#download-file').prop('disabled', false);
+        $('#hint').prop('hidden', true)
+      }
+  });
+
+  })
+});
+*/
+/* Caricare file */
 $(document).ready(function(){
   $('#load-file').click(function(){
     /* Dialog per selezionare il file da caricare  */
@@ -98,41 +161,36 @@ $(document).ready(function(){
       return
     }
 
-    popupS.prompt({
-      //TODO: Con l'invio non funziona, controllare perchè!
-      content: 'Inserire il codice fiscale della società',
-      onSubmit: function(societyCF) {
-        if(societyCF === null) {
-          alert('Inserire qualcosa!')
-          return
-        }
-        //var fileName = e.target.files[0].path;
-        if(typeof require !== 'undefined') XLSX = require('xlsx');
-        var workbook = XLSX.readFile(fileName[0], {cellDates:true, cellNF:false, cellText:false});
-        var first_sheet_name = workbook.SheetNames[0];
-        /* Ottieni worksheet */
-        var worksheet = workbook.Sheets[first_sheet_name];
+    //var fileName = e.target.files[0].path;
+    if(typeof require !== 'undefined') XLSX = require('xlsx');
+    var workbook = XLSX.readFile(fileName[0], {cellDates:true, cellNF:false, cellText:false});
+    var first_sheet_name = workbook.SheetNames[0];
+    /* Ottieni worksheet */
+    var worksheet = workbook.Sheets[first_sheet_name];
 
-        /* Convert all sheet to json object */
-        var jsonString = XLSX.utils.sheet_to_json(worksheet, {dateNF:'YYYY-MM-DD'})
+    /* Convert all sheet to json object */
+    var jsonString = XLSX.utils.sheet_to_json(worksheet, {dateNF:'YYYY-MM-DD'})
 
-        /* Riempi tabella */
-        $.each(jsonString, function(i, item){
-          if(item.DataNascita != null && item.Cognome != null && item.Nome != null && item.DataNascita != null){ // Necessario per via di un errore che blocca tutta la funzione
-            table.row.add({
-              'Cognome':          item.Cognome,
-              'Nome':             item.Nome,
-              'Data di Nascita':  item.DataNascita.getDate() + '/' + (item.DataNascita.getMonth() + 1) + '/' + item.DataNascita.getUTCFullYear(),
-              'Codice Fiscale':   item.CodFis,
-              'Codice Fiscale Società': societyCF
-            }).draw( false );
-          }
-        }); // End foreach
-        
-        $('#download-file').prop('disabled', false);
-        $('#hint').prop('hidden', true)
-      }
-  });
+    /* Riempi tabella */
+    $.each(jsonString, function(i, item){
+      alert(JSON.stringify(jsonString))
+      //if(item.DataNascita != null && item.Cognome != null && item.Nome != null && item.DataNascita != null){ // Necessario per via di un errore che blocca tutta la funzione
+        table.row.add({
+          'Pettorale':        item.Pettorale,
+          'Cognome':          item.Cognome,
+          'Nome':             item.Nome,
+          'Sesso':            item.Sesso,
+          'DataNascita':      item['Data di Nascita'],
+          //'DataNascita':      item['Data di Nascita'].getDate() + '/' + (itemitem['Data di Nascita'].getMonth() + 1) + '/' + itemitem['Data di Nascita'].getUTCFullYear(),
+          'Cat':              item.Cat,
+          'CodFis':           item.CodFis,
+          'CodFisSoc':        'ciao'
+        }).draw( false );
+      //}
+    }); // End foreach
+    
+    $('#download-file').prop('disabled', false);
+    $('#hint').prop('hidden', true)
 
   })
 });

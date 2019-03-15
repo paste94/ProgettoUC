@@ -1,6 +1,31 @@
-table.dataTable.stripe tbody tr.odd.selected, table.dataTable.display tbody tr.odd.selected {
-    background-color: #acbad4;
+table.dataTable tbody tr.odd.selected {
+    background-color: #ffee58;
 }
-table.dataTable tbody tr.selected {
-    background-color: #B0BED9;
+table.dataTable tbody tr.even.selected {
+    background-color: #fff176;
+}
+
+table.dataTable thead .sorting_desc {
+    background-image: url(icons/sort_desc.png);
+    cursor: hand;
+    background-repeat: no-repeat;
+    background-position: center right;
+}
+
+table.dataTable thead .sorting_asc {
+    background-image: url(icons/sort_asc.png);
+    cursor: hand;
+    background-repeat: no-repeat;
+    background-position: center right;
+}
+
+table.dataTable thead .sorting {
+    background-image: url(icons/sort_both.png);
+    cursor: hand;
+    background-repeat: no-repeat;
+    background-position: center right;
+}
+
+table.dataTable.nowrap th, table.dataTable.nowrap td {
+    white-space: nowrap;
 }
