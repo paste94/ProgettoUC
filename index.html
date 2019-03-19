@@ -6,11 +6,10 @@
     <link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.css">
     <link rel="stylesheet" href="util.css">
     <link rel="stylesheet" href="node_modules/popups/css/popupS.min.css">
-    <title>Hello World!</title>
+    <title>Races Manager</title>
   </head>
   <body>
 
-    <i class="fas fa-igloo"></i>
     <div class="container-fluid">
 
 
@@ -23,18 +22,24 @@
         <!-- CARD HEADER -->
         <div class="card-header">
           <div class="row text-left">
-            <div class="col-6">
+            <div class="col-4">
               <h1 style="padding-left: 0.5em;">Races Manager</h1>
             </div>
-            <div class="col-6">
+            <div class="col-8">
               <div class="row text-right">
                 <!-- SCEGLI FILE -->
                 <div class="custom-file" style="padding-right:2em; padding-top: 0.5em;">
+                  <!--Aggiungi manualmente-->
+                  <button id="add-person" type="button" class="btn btn-success" data-toggle="modal" data-target="#add-modal">
+                    <i class="fa fa-plus"></i> Aggiungi manualmente</label>
+                  </button>
+                  <!--Aggiungi XLS-->
                   <button id="load-file" type="button" class="btn btn-success">
                     <i class="fa fa-file-excel-o"></i> Carica file Excel</label>
                   </button>
+                  <!--APRI-->
                   <button id="load-file-bici" type="button" class="btn btn-success">
-                    <i class="fa fa-folder-open"></i>Apri</label>
+                    <i class="fa fa-folder-open"></i> Apri</label>
                   </button>
                 </div>
               </div>
@@ -81,17 +86,77 @@
       </div>
     </div>
     <p id="debug"></p>
+
+    <!-- Modal aggiungi corridore -->
+<div class="modal fade bd-example-modal-lg" id="add-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Inserisci nuovo utente</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="row" style="padding: 1em">
+            <div class="col-lg-6">
+                <label for="cognome">Cognome:</label>
+                <input type="text" class="form-control" id="cognome" placeholder="Cognome">
+            </div>
+            <div class="col-lg-6">
+                <label for="nome">Nome:</label>
+                <input type="text" class="form-control" id="nome" placeholder="Nome">
+            </div>
+          </div>
+
+          <div class="row" style="padding: 1em">
+            <div class="col-lg-6">
+                <label for="sesso">Sesso:</label>
+                <select class="form-control" id="sesso">
+                    <option>Seleziona...</option>
+                    <option>M</option>
+                    <option>F</option>
+                </select>
+            </div>
+            <div class="col-lg-6">
+                <label for="data">Data di nascita:</label>
+                <input type="text" class="form-control" id="data" placeholder="GG/MM/AAAA">
+            </div>
+          </div>
+          <div class="row" style="padding: 1em">
+            <div class="col-lg-6">
+                <label for="cf">Codice Fiscale:</label>
+                <input type="text" class="form-control" id="cf" placeholder="Codice Fiscale">
+            </div>
+            <div class="col-lg-6">
+                <label for="codice-soc">Codice Società:</label>
+                <input type="text" class="form-control" id="codice-soc" placeholder="Codice Società">
+            </div>
+          </div>
+          <div class="row" style="padding: 1em">
+            <div class="col-lg-6">
+                <label for="nome-soc">Nome della società:</label>
+                <input type="text" class="form-control" id="nome-soc" placeholder="Nome della società">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal"> <i class="fa fa-times"></i> Chiudi</button>
+          <button type="button" class="btn btn-primary" id="add-row"><i class="fa fa-plus"></i> Aggiungi</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  
     <!-- XLSX -->
     <script lang="javascript" src="node_modules/xlsx/dist/xlsx.full.min.js"></script>
-
-
-    <!--jQuery-->
-    <script>
-
-    </script>
     <!--Elenco di funzioni jquery-->
     <script type="text/javascript" src="utilities.js"></script>
     <!--script lang="javascript" src="node_modules/datatables.net-buttons/js/buttons.html5.js"></script-->
+
+    
 
   </body>
 </html>

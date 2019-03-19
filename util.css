@@ -29,3 +29,7 @@ table.dataTable thead .sorting {
 table.dataTable.nowrap th, table.dataTable.nowrap td {
     white-space: nowrap;
 }
+
+tr{
+    transition: 0.3s;
+}
