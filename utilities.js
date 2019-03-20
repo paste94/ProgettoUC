@@ -3,8 +3,8 @@ window.$ = window.jQuery = require("jquery")
 var dt = require( 'datatables.net' )( window, $ );
 require( 'jszip' );
 require( 'datatables.net-bs4' )();
-require( 'datatables.net-buttons-bs4' )();
-require( 'datatables.net-buttons/js/buttons.html5.js' )();
+require( 'datatables.net-buttons-bs4' )( $ );
+//require( 'datatables.net-buttons/js/buttons.html5.js' )();
 require( 'datatables.net-select-bs4' )();
 require( 'datatables.net-dt' )( window, $ );
 require('bootstrap')
@@ -14,48 +14,79 @@ const year=2;
 const fs = require("fs");
 const {dialog} = require("electron").remote;
 var popupS = require('popups');
-var table; // Utilizzata per datatables
 
+var tablePar = { //Parametri per la creazione della tabella
+  createdRow: function(row, data, dataIndex ){
+    if(data.selezionato == 'si'){
+      $(row).addClass('selected')
+    }
+  },
+  buttons: [
+    {
+        text: 'My button',
+        action: function ( e, dt, node, config ) {
+            alert( 'Button activated' );
+        }
+    }
+  ],
+  lengthMenu: [[10,50,100,500,-1], [10,50,100,500,'All']],
+  columns: [
+          { data: "Cognome", title: "Cognome" },
+          { data: "Nome", title: "Nome" },
+          { data: "Sesso", title: "Sesso" },
+          { data: "DataNascita", title: "Data di Nascita" },
+          { data: "Codice Fiscale", title: "Codice Fiscale" },
+          { data: "Codice", title: "Cod.Soc."},
+          { data: "IDSodalizio", title: "Nome Società"},
+          { data: "chip", title: "Chip"}
+      ],
+    columnDefs:[
+      { targets:[7], render : function(data){return createSelect(data);} }   
+    ]
+}
+
+// Creazione tabella. Se esiste un file database allora chiede se si vuole caricare il 
+// file esistente, altrimenti crea una tabella vuota. Per caricare il file esistente
+// Vengono aggiunti due parametri (ajax e createdRow) a quelli per caricare la tabella.
+if(fs.existsSync('database.bici')){ 
+  if(confirm('Si desidera caricare la tabella salvata in precedenza?')){
+      // Assegna alla tabella la proprietà di datatables
+    tablePar.ajax = {
+        url: 'database.bici',
+        dataSrc: '',
+        deferRender: true
+      };
+
+      tablePar.createdRow = function( row, data, dataIndex ) {
+        if(data.selezionato == 'si'){
+          $(row).addClass('selected')
+        }
+        row.lastChild.innerHTML = createSelect(data.selezChip)
+      }
+  }
+}
+
+// Creazione della tabella
+var table = $('#tableOfPeople').DataTable(tablePar);
 
 $(document).ready(function(){
-  // Assegna alla tabella la proprietà di datatables
-  table = $('#tableOfPeople').DataTable({
-     lengthMenu: [[10,50,100,500,-1], [10,50,100,500,'All']],
-     columns: [
-             { data: "Cognome", title: "Cognome" },
-             { data: "Nome", title: "Nome" },
-             { data: "Sesso", title: "Sesso" },
-             { data: "DataNascita", title: "Data di Nascita" },
-             { data: "Codice Fiscale", title: "Codice Fiscale" },
-             { data: "Codice", title: "Cod.Soc."},
-             { data: "IDSodalizio", title: "Nome Società"},
-             { data: "chip", title: "Chip"}
-         ],
-      columnDefs:[
-        { targets:[7], render : function(data){return createSelect(data);} }   
-      ]         
-  }) // Fine DataTable
-
-
-/*
-  var table = $('#example').DataTable( {
-    columnDefs:[{targets:[0,1,3,4,5], type:"dom-text", render:function(data, type, row, meta){
-        return "<input type='text' value='" +  data + "'>";
-    }},
-    {targets:[2], render : 
-     function(data){}}           
-               ]
-  });
-*/
-
-
-
   // Scarica il file dei corridori
   $('#download-file').click(function(){
     // Crea un file json con i dati selezionati in tabella 
     var jsonObj = [];
     table.rows('.selected').every(function(rowIdx, tableLoop, rowLoop){
-      jsonObj.push(this.data()); // Stringa json che rappresenta la riga
+      var o = {}
+      o.Pettorale = ''
+      o.Cognome = this.data().Cognome
+      o.Nome = this.data().Nome
+      o.Sesso = this.data().Sesso
+      o['Data di Nascita'] = this.data().DataNascita
+      o.Cat = ''
+      o.Tessera = ''
+      o['Cod.Soc.'] = this.data().Codice
+      o.Team = this.data().IDSodalizio
+      o.Tessera = ''
+      jsonObj.push(o); // Stringa json che rappresenta la riga
     })
 
     // Controlla che il file contenga qualcosa 
@@ -88,13 +119,78 @@ $(document).ready(function(){
     
   }); // Fine scarica file dei corridori
 
+  // Scarica file classifica
+  $('#download-classifica').click(function(){
+    var jsonObj = [];
+    /* Formato oggetto
+    {
+      'Società':        
+      'Comune':         
+      'Codice Società': 
+      'Ente':           
+      'Q.ta':           
+    };
+    */
+    table.rows('.selected').every(function(rowIdx, tableLoop, rowLoop){
+      if($('select', this.node()).val() == 'Si'){ // Ho selezionato la riga che contiene 'Si'
+        var data = this.data()
+        var flag = true;
+        $(jsonObj).each(function(i, item){
+          if(data['Codice'] == item['Cod.Soc.']){
+            alert(data['Cod.Soc.'] + ' --- ' + item['Cod.Soc.'])
+            this['Q.ta']++
+            flag = false
+          }
+        })
+        if(flag){//Se non esisteva ancora la squadra allora crea una riga 
+          var o = {}
+          o['Società'] = data.IDSodalizio
+          o['Comune'] = ''
+          o['Codice Società'] = data.Codice
+          o['Ente']  = ''
+          o['Q.ta'] = 1
+          jsonObj.push(o)
+        } 
+      }
+    })
+    // Controlla che il file contenga qualcosa 
+    if(jsonObj.length <= 0){
+      alert('Attenzione, selezionare almeno una riga prima di proseguire!');
+      return;
+    }
+
+    // Mostra la finestra per selezionare dove salvare il file 
+    var filename = dialog.showSaveDialog({
+      filters: [
+        {
+          name: 'Excel (.xlsx)',
+          extensions: ['xlsx']
+        }
+      ]
+    })
+    
+    // Controllo stupido
+    if(filename == null){
+      return;
+    }
+
+    // Salva il file 
+    if(typeof require !== 'undefined') XLSX = require('xlsx'); // Richiede dipendenze se non ci sono
+    var ws = XLSX.utils.json_to_sheet(jsonObj); // Converte l'oggetto json in un file xls
+    var wb = XLSX.utils.book_new(); // Crea un nuovo file xls
+    XLSX.utils.book_append_sheet(wb, ws, "People"); // Scrive la tabella nel file 
+    XLSX.writeFile(wb, filename); // Salva il file nel percorso selezionato
+    
+
+  }) //FINE scarica file classifica
+
   // Definisce la selezione di un corridore sulla tabella 
   // Imposta 'selected' alla riga 
   $('#tableOfPeople tbody').on( 'click', 'tr', function () {
     $(this).toggleClass('selected');
   } ); // FINE select
 
-  // Caricare file XLS
+  // Carica file XLS
   $('#load-file').click(function(){
     if(table.rows().count() > 0){
       if (!confirm('ATTENZIONE: Se viene caricato un nuovo file le nuove righe verranno aggiunte inseme alle vecchie! \n Si desidera procedere ugualmente?')) {
@@ -209,36 +305,6 @@ $(document).ready(function(){
     $('#download-classifica').prop('disabled', false);
   }) // FINE Carica file JSON
 
-  // Salva la tabella in formato JSON
-  $('#save-table').click(function(){
-    /* Crea un file json con i dati selezionati in tabella */
-    var jsonObj = [];
-    table.rows().every(function(rowIdx, tableLoop, rowLoop){
-      //alert($('select', this.node()).val()); // Prende il valore della select
-      //alert(JSON.stringify(jsonObj))
-      var o = this.data();
-      o.selezChip = $('select', this.node()).val() // Prende il valore della select
-      o.selezionato = 'no' // TODO: Implementa il salvataggio delle righe selezionate
-      jsonObj.push(this.data()); // Stringa json che rappresenta la riga
-    })
-
-    //alert(JSON.stringify(jsonObj))
-
-    /* Mostra il dialog per selezionare dove salvare il file */
-    var fileName = dialog.showSaveDialog({
-      filters: [
-        {
-          name: 'Bici (.bici)',
-          extensions: ['bici']
-        }
-      ]
-    })
-
-    var jsonString = JSON.stringify(jsonObj);
-    fs.writeFile(fileName, jsonString, 'utf8', function(){});
-
-  })// FINE salva file JSON
-
   // Aggiungi un corridore manualmente 
   $('#add-row').click(function(){
     //alert($('#cognome').val())
@@ -318,8 +384,69 @@ $(document).ready(function(){
 
   }); // FINE Aggiungi un corridore manualmente
 
+  // Salva la tabella in formato JSON dove vuoi tu
+  $('#save-table').click(function(){
+    /* Mostra il dialog per selezionare dove salvare il file */
+    var fileName = dialog.showSaveDialog({
+      filters: [
+        {
+          name: 'Bici (.bici)',
+          extensions: ['bici']
+        }
+      ]
+    })
+
+    var jsonString = table_to_jsonString();
+    fs.writeFile(fileName, jsonString, 'utf8', function(){});
+  })// FINE salva file JSON
+
+  // Salva la tabella velocemente
+  $('#save').click(function(){
+    if(fs.existsSync('database.bici')){
+      if(confirm('ATTENZIONE! Sovrascrivere il precedente database salvato?')){
+        jsonString = table_to_jsonString()
+        fs.writeFile('database.bici', jsonString, 'utf8', function(){});
+        alert('File salvato corrrettamente')
+      }
+    }
+  }) // FINE Salva la tabella velocemente 
+
+  // Deseleziona tutto 
+  $('#deselect-all').click(function(){
+    if(confirm('Deselezionare tutti gli elementi?')) 
+      table.rows().deselect()
+  })
+
+
 }) // Fine ready
 
+
+// Crea il file json a partire dalla tabella
+function table_to_jsonString(){
+  var jsonObj = [];
+  var selectedRows = [];
+
+  table.rows('.selected').every(function(rowIdx, tableLoop, rowLoop){
+    selectedRows.push(rowIdx);
+  })
+
+  console.log(selectedRows)
+
+  table.rows().every(function(rowIdx, tableLoop, rowLoop){
+    //alert($('select', this.node()).val()); // Prende il valore della select
+    //alert(JSON.stringify(jsonObj))
+    var o = this.data();
+    o.selezChip = $('select', this.node()).val() // Prende il valore della select
+    if(selectedRows.includes(rowIdx)){
+      console.log('si')
+      o.selezionato = 'si'
+    }else{
+      o.selezionato = 'no'
+    }
+    jsonObj.push(this.data()); // Stringa json che rappresenta la riga
+  })
+  return JSON.stringify(jsonObj);
+}
 
 // the function creates a select box
 function createSelect(){
@@ -335,10 +462,10 @@ function createSelect(v){
   var sel = "<select>" ;  
   if(v=='Si'){
     sel += "<option value = 'No' >No</option>"
-    sel += "<option selected value = 'Si' >Si</option>"
+    sel += "<option selected value = 'Si' >Sì</option>"
   }else{
     sel += "<option selected value = 'No' >No</option>"
-    sel += "<option value = 'Si' >Si</option>"
+    sel += "<option value = 'Si' >Sì</option>"
   }
   sel += "</select>";
   return sel;

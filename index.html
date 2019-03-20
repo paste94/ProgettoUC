@@ -47,7 +47,6 @@
           </div>
         </div> <!-- /CARD HEADER -->
         <div class="card-body"> <!-- CARD BODY -->
-          <h3 id="hint">Fare click su "Carica file excel" per generare la tabella</h3>
           <div class="scrollable">
             <table class="table table-striped table-bordered" id="tableOfPeople">
               <thead>
@@ -65,21 +64,33 @@
         <div class="card-footer"> <!-- CARD FOOTER -->
           <!--Scarica file presenze in gara-->
           <!--TODO: Modifica aggiungendo -->
-          <button id="download-file" class="btn btn-primary" disabled='true'>
+          <button id="download-file" class="btn btn-primary" >
             <i class="fa fa-download"></i>
               Scarica file Presenze
           </button>
           <!--Salva il file delle rpesenze (modello nella mail del 14 marzo)-->
           <!--TODO: Implementare-->
-          <button id="download-classifica" class="btn btn-primary" disabled='true'>
+          <button id="download-classifica" class="btn btn-primary" >
             <i class="fa fa-download"></i>
               Scarica file Classifica
           </button>
           <!--Salva la tabella in locale-->
           <!--TODO: Implementa il salvataggio dei file-->
-          <button id="save-table" class="btn btn-primary" disabled='true'>
+          <button id="save-table" class="btn btn-primary">
+            <i class="fa fa-save"></i>
+              Salva tabella con Nome
+          </button>
+
+          <!--Salva la tabella in locale-->
+          <!--TODO: Implementa il salvataggio dei file-->
+          <button id="save" class="btn btn-primary">
             <i class="fa fa-save"></i>
               Salva tabella
+          </button>
+
+          <button id="deselect-all" class="btn btn-danger" style="float:right">
+            <i class="fa fa-times"></i>
+              Deseleziona Tutto
           </button>
           
         </div> <!-- /CARD FOOTER -->
